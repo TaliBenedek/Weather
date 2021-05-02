@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          alignment="center"
+          hgap="10" vgap="10"
+          fx:controller="benedek.openweathermap.OpenWeatherMapController"
+          prefHeight="400.0" prefWidth="600.0">
+    <padding>
+        <Insets bottom="10" left="25" right="25" top="25" />
+    </padding>
+    <Label fx:id="locationLabel" text="Location"
+            GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="1"/>
+    <TextField fx:id="locationTextField" prefWidth="75"
+               GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"
+                />
+    <ComboBox fx:id="comboBox"
+              GridPane.rowIndex="1" GridPane.columnIndex="0">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="Fahrenheit"/>
+                <String fx:value="Celsius"/>
+            </FXCollections>
+        </items>
+        <value>
+            <String fx:value="Fahrenheit"/>
+        </value>
+    </ComboBox>
+    <Text text="Day1" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <Text text="Temp1" fx:id="temp1" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <Text text="Icon1" fx:id="icon1" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+
+    <Text text="Day2" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <Text text="Temp2" fx:id="temp2" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+    <Text text="Icon2" fx:id="icon2" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+
+    <Text text="Day3" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+    <Text text="Temp3" fx:id="temp3" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    <Text text="Icon3" fx:id="icon3" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+
+    <Text text="Day4" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+    <Text text="Temp4" fx:id="temp4" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+    <Text text="Icon4" fx:id="icon4" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+
+    <Text text="Day5" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+    <Text text="Temp5" fx:id="temp5" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+    <Text text="Icon5" fx:id="icon5" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
+
+</GridPane>
