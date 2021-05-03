@@ -13,7 +13,7 @@ public class OpenWeatherMapApplication extends Application
     {
         Parent root = FXMLLoader.load(getClass().getResource("/weather_application.fxml"));
 
-        Scene scene = new Scene(root, 500, 275);
+        Scene scene = new Scene(root, 500, 500);
 
         stage.setTitle("Weather");
         stage.setScene(scene);

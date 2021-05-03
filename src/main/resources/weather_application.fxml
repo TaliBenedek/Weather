@@ -40,27 +40,27 @@
 
     <Text text="Current" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
     <Text text="CurrentTemp" fx:id="currentTemp" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-    <ImageView fx:id="currentIcon" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+    <ImageView fx:id="currentIcon" GridPane.rowIndex="2" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
     <Text text="Day1" fx:id="day1" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
     <Text text="Temp1" fx:id="temp1" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-    <ImageView fx:id="icon1" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+    <ImageView fx:id="icon1" GridPane.rowIndex="3" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
     <Text text="Day2" fx:id="day2" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
     <Text text="Temp2" fx:id="temp2" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-    <ImageView fx:id="icon2" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+    <ImageView fx:id="icon2" GridPane.rowIndex="4" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
     <Text text="Day3" fx:id="day3" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
     <Text text="Temp3" fx:id="temp3" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-    <ImageView fx:id="icon3" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+    <ImageView fx:id="icon3" GridPane.rowIndex="5" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
     <Text text="Day4" fx:id="day4" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
     <Text text="Temp4" fx:id="temp4" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-    <ImageView fx:id="icon4" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
+    <ImageView fx:id="icon4" GridPane.rowIndex="6" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
     <Text text="Day5" fx:id="day5" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
     <Text text="Temp5" fx:id="temp5" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
-    <ImageView fx:id="icon5" GridPane.rowIndex="7" GridPane.columnIndex="2"/>
+    <ImageView fx:id="icon5" GridPane.rowIndex="7" GridPane.columnIndex="2" fitWidth="50" fitHeight="50"/>
 
 
     <fx:define>
