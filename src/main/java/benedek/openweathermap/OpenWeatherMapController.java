@@ -11,8 +11,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.List;
 
 public class OpenWeatherMapController
@@ -22,6 +24,15 @@ public class OpenWeatherMapController
 
     @FXML
     ComboBox comboBox;
+
+    @FXML
+    Text currentTemp;
+
+    @FXML
+    ImageView currentIcon;
+
+    @FXML
+    List<Text> dateTexts;
 
     @FXML
     List<Text> tempTexts;
@@ -41,9 +52,7 @@ public class OpenWeatherMapController
     public void go(ActionEvent actionEvent)
     {
         String location = locationTextField.getText();
-        String units;
-
-        units = String.valueOf(comboBox.getValue()).equals("Fahrenheit")
+        String units = String.valueOf(comboBox.getValue()).equals("Fahrenheit")
                 ? "imperial"
                 : "metric";
 
@@ -58,12 +67,17 @@ public class OpenWeatherMapController
 
     private void onOpenWeatherMapFeed(OpenWeatherMapForecast forecast) throws FileNotFoundException
     {
+        currentTemp.setText(String.valueOf(forecast.list.get(0).main.temp));
+        ImageView currImageView = new ImageView(forecast.list.get(0).weather.get(0).getIconUrl());
+        currentIcon.setImage(currImageView.getImage());
         for(int ix = 0; ix < 5; ix++)
         {
             OpenWeatherMapForecast.HourlyForecast day = forecast.getForcastFor(ix+1);
+            Date date = day.getDate();
+            String[] splitDate = date.toString().split(" ");
+            dateTexts.get(ix).setText(splitDate[0] + " " + splitDate[1] + " " + splitDate[2]);
             double temp = day.main.temp;
             tempTexts.get(ix).setText(String.valueOf(temp));
-            //Image image = new Image(new FileInputStream(day.weather.get(0).getIconUrl()));
             ImageView imageView = new ImageView(day.weather.get(0).getIconUrl());
             iconImages.get(ix).setImage(imageView.getImage());
         }
@@ -71,7 +85,7 @@ public class OpenWeatherMapController
 
 
     public void onError(Throwable throwable) {
-        // this is not the correct way to handle errors
-        System.out.println("error occurred");
+        JOptionPane.showMessageDialog(null,
+                "An error occurred, please try again.");
     }
 }
