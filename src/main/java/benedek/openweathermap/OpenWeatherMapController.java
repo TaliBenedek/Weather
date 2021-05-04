@@ -41,15 +41,23 @@ public class OpenWeatherMapController
 
     OpenWeatherMapService service;
 
+    OpenWeatherMapServiceFactory factory;
+
     // Dependency injection
-    public OpenWeatherMapController(OpenWeatherMapService service)
+    public OpenWeatherMapController(OpenWeatherMapServiceFactory factory, OpenWeatherMapService service)
     {
+        this.factory = factory;
         this.service = service;
     }
+
+    public OpenWeatherMapController()
+    {
+        factory = new OpenWeatherMapServiceFactory();
+    }
+
     @FXML
     public void initialize()
     {
-        OpenWeatherMapServiceFactory factory = new OpenWeatherMapServiceFactory();
         service = factory.newInstance();
     }
 
@@ -69,9 +77,9 @@ public class OpenWeatherMapController
                 .subscribe(this::onOpenWeatherMapForecast, this::onError);
     }
 
-    private void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast) throws FileNotFoundException
+    public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast) throws FileNotFoundException
     {
-        currentTemp.setText(String.valueOf(forecast.list.get(0).main.temp));
+        currentTemp.setText(String.format("%.0f\u00B0", forecast.list.get(0).main.temp));
         ImageView currImageView = new ImageView(forecast.list.get(0).weather.get(0).getIconUrl());
         currentIcon.setImage(currImageView.getImage());
         for(int ix = 0; ix < 5; ix++)
@@ -81,7 +89,7 @@ public class OpenWeatherMapController
             String[] splitDate = date.toString().split(" ");
             dateTexts.get(ix).setText(splitDate[0] + " " + splitDate[1] + " " + splitDate[2]);
             double temp = day.main.temp;
-            tempTexts.get(ix).setText(String.valueOf(temp));
+            tempTexts.get(ix).setText(String.format("%.0f\u00B0", temp));
             ImageView imageView = new ImageView(day.weather.get(0).getIconUrl());
             iconImages.get(ix).setImage(imageView.getImage());
         }
