@@ -12,7 +12,6 @@ import javafx.scene.text.Text;
 
 
 import javax.swing.*;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +41,11 @@ public class OpenWeatherMapController
 
     OpenWeatherMapService service;
 
+    // Dependency injection
+    public OpenWeatherMapController(OpenWeatherMapService service)
+    {
+        this.service = service;
+    }
     @FXML
     public void initialize()
     {
@@ -62,10 +66,10 @@ public class OpenWeatherMapController
                 // work with the data in the foreground
                 .observeOn(Schedulers.trampoline())
                 // work with the feed whenever it gets downloaded
-                .subscribe(this::onOpenWeatherMapFeed, this::onError);
+                .subscribe(this::onOpenWeatherMapForecast, this::onError);
     }
 
-    private void onOpenWeatherMapFeed(OpenWeatherMapForecast forecast) throws FileNotFoundException
+    private void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast) throws FileNotFoundException
     {
         currentTemp.setText(String.valueOf(forecast.list.get(0).main.temp));
         ImageView currImageView = new ImageView(forecast.list.get(0).weather.get(0).getIconUrl());
@@ -82,7 +86,6 @@ public class OpenWeatherMapController
             iconImages.get(ix).setImage(imageView.getImage());
         }
     }
-
 
     public void onError(Throwable throwable) {
         JOptionPane.showMessageDialog(null,
