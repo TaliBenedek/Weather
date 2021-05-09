@@ -41,24 +41,29 @@ public class OpenWeatherMapController
 
     OpenWeatherMapService service;
 
-    OpenWeatherMapServiceFactory factory;
 
     // Dependency injection
-    public OpenWeatherMapController(OpenWeatherMapServiceFactory factory, OpenWeatherMapService service)
+    public OpenWeatherMapController(OpenWeatherMapService service)
     {
-        this.factory = factory;
         this.service = service;
     }
 
     public OpenWeatherMapController()
     {
-        factory = new OpenWeatherMapServiceFactory();
+        service = new OpenWeatherMapServiceFactory().newInstance();
     }
 
     @FXML
     public void initialize()
     {
-        service = factory.newInstance();
+        locationTextField.setText("New York");
+        Disposable disposable = service.getWeatherForecast("New York", "imperial")
+                // request the data in the background
+                .subscribeOn(Schedulers.io())
+                // work with the data in the foreground
+                .observeOn(Schedulers.trampoline())
+                // work with the feed whenever it gets downloaded
+                .subscribe(this::onOpenWeatherMapForecast, this::onError);
     }
 
     public void go(ActionEvent actionEvent)
@@ -68,13 +73,7 @@ public class OpenWeatherMapController
                 ? "imperial"
                 : "metric";
 
-        Disposable disposable = service.getWeatherForecast(location, units)
-                // request the data in the background
-                .subscribeOn(Schedulers.io())
-                // work with the data in the foreground
-                .observeOn(Schedulers.trampoline())
-                // work with the feed whenever it gets downloaded
-                .subscribe(this::onOpenWeatherMapForecast, this::onError);
+
     }
 
     public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast) throws FileNotFoundException

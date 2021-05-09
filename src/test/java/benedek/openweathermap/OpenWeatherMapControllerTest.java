@@ -1,5 +1,6 @@
 package benedek.openweathermap;
 
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.event.ActionEvent;
@@ -42,15 +43,17 @@ public class OpenWeatherMapControllerTest
     public void initialize()
     {
         //given
-        givenOpenWeatherMapController();
-        OpenWeatherMapService mockService = mock(OpenWeatherMapService.class);
-        doReturn(mockService).when(factory).newInstance();
+        OpenWeatherMapService service = mock(OpenWeatherMapService.class);
+        OpenWeatherMapController controller = new OpenWeatherMapController(service);
+        doReturn(Single.never()).when(service).getCurrentWeather("New York", "imperial");
+        doReturn(Single.never()).when(service).getWeatherForecast("New York", "imperial");
 
         //when
         controller.initialize();
 
         //then
-        verify(factory).newInstance();
+        verify(service).getCurrentWeather("New York", "imperial");
+        verify(service).getWeatherForecast("New York", "imperial");
     }
 
     @Test
@@ -136,9 +139,8 @@ public class OpenWeatherMapControllerTest
 
     private void givenOpenWeatherMapController()
     {
-        factory = mock(OpenWeatherMapServiceFactory.class);
         service = mock(OpenWeatherMapService.class);
-        controller = new OpenWeatherMapController(factory, service);
+        controller = new OpenWeatherMapController(service);
         
         locationTextField = mock(TextField.class);
         controller.locationTextField = locationTextField;
