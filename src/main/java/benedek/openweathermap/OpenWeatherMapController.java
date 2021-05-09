@@ -57,13 +57,7 @@ public class OpenWeatherMapController
     public void initialize()
     {
         locationTextField.setText("New York");
-        Disposable disposable = service.getWeatherForecast("New York", "imperial")
-                // request the data in the background
-                .subscribeOn(Schedulers.io())
-                // work with the data in the foreground
-                .observeOn(Schedulers.trampoline())
-                // work with the feed whenever it gets downloaded
-                .subscribe(this::onOpenWeatherMapForecast, this::onError);
+        callService("New York", "imperial");
     }
 
     public void go(ActionEvent actionEvent)
@@ -72,15 +66,36 @@ public class OpenWeatherMapController
         String units = String.valueOf(comboBox.getValue()).equals("Fahrenheit")
                 ? "imperial"
                 : "metric";
-
-
+        callService(location, units);
     }
 
-    public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast) throws FileNotFoundException
+    private void callService(String location, String units)
     {
-        currentTemp.setText(String.format("%.0f\u00B0", forecast.list.get(0).main.temp));
-        ImageView currImageView = new ImageView(forecast.list.get(0).weather.get(0).getIconUrl());
-        currentIcon.setImage(currImageView.getImage());
+        Disposable disposable = service.getCurrentWeather(location, units)
+                // request the data in the background
+                .subscribeOn(Schedulers.io())
+                // work with the data in the foreground
+                .observeOn(Schedulers.trampoline())
+                // work with the feed whenever it gets downloaded
+                .subscribe(this::onOpenWeatherMapFeed, this::onError);
+
+        Disposable disposable2 = service.getWeatherForecast(location, units)
+                // request the data in the background
+                .subscribeOn(Schedulers.io())
+                // work with the data in the foreground
+                .observeOn(Schedulers.trampoline())
+                // work with the feed whenever it gets downloaded
+                .subscribe(this::onOpenWeatherMapForecast, this::onError);
+    }
+
+    public void onOpenWeatherMapFeed(OpenWeatherMapFeed feed)
+    {
+        currentTemp.setText(String.format("%.0f\u00B0", feed.main.getTemperature()));
+        currentIcon.setImage(new Image(feed.weather.get(0).getIconUrl()));
+    }
+
+    public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast)
+    {
         for(int ix = 0; ix < 5; ix++)
         {
             OpenWeatherMapForecast.HourlyForecast day = forecast.getForcastFor(ix+1);
