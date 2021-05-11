@@ -48,7 +48,7 @@ public class OpenWeatherMapForecast
      * @param day the amount of days after today to retrieve the midday forecast for.
      * @return the forecast matching 11 AM for the specified day or null if the day is out of range.
      */
-    public HourlyForecast getForcastFor(int day) {
+    public HourlyForecast getForecastFor(int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, day);
         calendar.set(Calendar.HOUR_OF_DAY, 11);
@@ -61,7 +61,6 @@ public class OpenWeatherMapForecast
                 return forecast;
             }
         }
-
         return null;
     }
 }

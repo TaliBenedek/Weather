@@ -12,7 +12,6 @@ import javafx.scene.text.Text;
 
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class OpenWeatherMapController
         callService(location, units);
     }
 
-    private void callService(String location, String units)
+    public void callService(String location, String units)
     {
         Disposable disposable = service.getCurrentWeather(location, units)
                 // request the data in the background
@@ -96,15 +95,14 @@ public class OpenWeatherMapController
 
     public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast)
     {
-        for(int ix = 0; ix < 5; ix++)
+        for(int ix = 0; ix < dateTexts.size(); ix++)
         {
-            OpenWeatherMapForecast.HourlyForecast day = forecast.getForcastFor(ix+1);
-            Date date = day.getDate();
-            String[] splitDate = date.toString().split(" ");
+            OpenWeatherMapForecast.HourlyForecast hourlyForecast = forecast.getForecastFor(ix+1);
+            String[] splitDate = hourlyForecast.getDate().toString().split(" ");
             dateTexts.get(ix).setText(splitDate[0] + " " + splitDate[1] + " " + splitDate[2]);
-            double temp = day.main.temp;
+            double temp = hourlyForecast.main.temp;
             tempTexts.get(ix).setText(String.format("%.0f\u00B0", temp));
-            ImageView imageView = new ImageView(day.weather.get(0).getIconUrl());
+            ImageView imageView = new ImageView(hourlyForecast.weather.get(0).getIconUrl());
             iconImages.get(ix).setImage(imageView.getImage());
         }
     }

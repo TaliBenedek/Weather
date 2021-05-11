@@ -1,24 +1,19 @@
 package benedek.openweathermap;
 
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.*;
 
 public class OpenWeatherMapControllerTest
@@ -43,8 +38,8 @@ public class OpenWeatherMapControllerTest
     public void initialize()
     {
         //given
-        OpenWeatherMapService service = mock(OpenWeatherMapService.class);
-        OpenWeatherMapController controller = new OpenWeatherMapController(service);
+        givenOpenWeatherMapController();
+        doReturn("New York").when(controller.locationTextField).getText();
         doReturn(Single.never()).when(service).getCurrentWeather("New York", "imperial");
         doReturn(Single.never()).when(service).getWeatherForecast("New York", "imperial");
 
@@ -52,6 +47,7 @@ public class OpenWeatherMapControllerTest
         controller.initialize();
 
         //then
+        verify(locationTextField).setText("New York");
         verify(service).getCurrentWeather("New York", "imperial");
         verify(service).getWeatherForecast("New York", "imperial");
     }
@@ -61,21 +57,18 @@ public class OpenWeatherMapControllerTest
     {
         //given
         givenOpenWeatherMapController();
-        Disposable disposable = mock(Disposable.class);
         doReturn("London").when(controller.locationTextField).getText();
         doReturn("Fahrenheit").when(controller.comboBox).getValue();
-        String units = String.valueOf(controller.comboBox.getValue()).equals("Fahrenheit")
-                ? "imperial"
-                : "metric";
+        doReturn(Single.never()).when(service).getCurrentWeather("London", "imperial");
+        doReturn(Single.never()).when(service).getWeatherForecast("London", "imperial");
 
         //when
         controller.go(mock(ActionEvent.class));
 
         //then
-        verify(controller.service).getWeatherForecast(controller.locationTextField.getText(), units)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(Schedulers.trampoline())
-                                    .subscribe(this::onOpenWeatherMapForecast, this::onError);
+        //verify(controller.service).getWeatherForecast(controller.locationTextField.getText(), "imperial");
+        verify(service).getCurrentWeather("London", "imperial");
+        verify(service).getWeatherForecast("London", "imperial");
     }
 
     @Test
@@ -83,58 +76,113 @@ public class OpenWeatherMapControllerTest
     {
         //given
         givenOpenWeatherMapController();
-        Disposable disposable = mock(Disposable.class);
         doReturn("London").when(controller.locationTextField).getText();
         doReturn("Celsius").when(controller.comboBox).getValue();
-        String units = String.valueOf(controller.comboBox.getValue()).equals("Fahrenheit")
-                ? "imperial"
-                : "metric";
+        doReturn(Single.never()).when(service).getCurrentWeather("London", "metric");
+        doReturn(Single.never()).when(service).getWeatherForecast("London", "metric");
 
         //when
         controller.go(mock(ActionEvent.class));
 
         //then
-        verify(controller.service).getWeatherForecast(controller.locationTextField.getText(), units)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.trampoline())
-                .subscribe(this::onOpenWeatherMapForecast, this::onError);
+        verify(service).getCurrentWeather("London", "metric");
+        verify(service).getWeatherForecast("London", "metric");
     }
 
     @Test
-    public void onOpenWeatherMapForecast() throws FileNotFoundException
+    public void callService_Imperial()
+    {
+        //given
+        givenOpenWeatherMapController();
+        doReturn(Single.never()).when(service).getCurrentWeather("London", "imperial");
+        doReturn(Single.never()).when(service).getWeatherForecast("London", "imperial");
+
+        //when
+        controller.callService("London", "imperial");
+
+        //then
+        verify(service).getCurrentWeather("London", "imperial");
+        verify(service).getWeatherForecast("London", "imperial");
+    }
+
+    @Test
+    public void callService_Metric()
+    {
+        //given
+        givenOpenWeatherMapController();
+        doReturn(Single.never()).when(service).getCurrentWeather("London", "metric");
+        doReturn(Single.never()).when(service).getWeatherForecast("London", "metric");
+
+        //when
+        controller.callService("London", "metric");
+
+        //then
+        verify(service).getCurrentWeather("London", "metric");
+        verify(service).getWeatherForecast("London", "metric");
+    }
+
+    @Test
+    public void onOpenWeatherMapFeed()
+    {
+        //given
+        givenOpenWeatherMapController();
+        OpenWeatherMapFeed feed = mock(OpenWeatherMapFeed.class);
+        feed.main = mock(OpenWeatherMapFeed.Main.class);
+        feed.weather = Arrays.asList(
+                mock(OpenWeatherMapFeed.Weather.class),
+                mock(OpenWeatherMapFeed.Weather.class));
+        doReturn(50.0).when(feed.main).getTemperature();
+        doReturn("http://openweathermap.org/img/wn/").when(feed.weather.get(0)).getIconUrl();
+        doReturn("50\u00B0").when(controller.currentTemp).getText();
+        doReturn(mock(Image.class)).when(controller.currentIcon).getImage();
+
+        //when
+        controller.onOpenWeatherMapFeed(feed);
+
+        //then
+        verify(controller.currentTemp).setText("50\u00B0");
+        verify(controller.currentIcon).setImage(any(Image.class));
+    }
+
+    @Test
+    public void onOpenWeatherMapForecast()
     {
         //given
         givenOpenWeatherMapController();
         OpenWeatherMapForecast forecast = mock(OpenWeatherMapForecast.class);
-        doReturn("50\u00B0").when(forecast.list.get(0).main.temp);
-        Image mockImage = mock(Image.class);
-        doReturn(mockImage).when(new ImageView(forecast.list.get(0).weather.get(0).getIconUrl()));
-        doReturn("49\u00B0").when(tempTexts.get(0).getText());
-        doReturn("48\u00B0").when(tempTexts.get(1).getText());
-        doReturn("52\u00B0").when(tempTexts.get(2).getText());
-        doReturn("Wed May 05").when(dateTexts.get(0).getText());
-        doReturn("Thu May 06").when(dateTexts.get(1).getText());
-        doReturn("Fri May 07").when(dateTexts.get(2).getText());
-        doReturn(mockImage).when(iconImages.get(0).getImage());
-        doReturn(mockImage).when(iconImages.get(1).getImage());
-        doReturn(mockImage).when(iconImages.get(2).getImage());
+        OpenWeatherMapForecast.HourlyForecast hourlyForecast
+                = mock(OpenWeatherMapForecast.HourlyForecast.class);
+        hourlyForecast.weather = Arrays.asList(
+                mock(OpenWeatherMapForecast.HourlyForecast.Weather.class),
+                mock(OpenWeatherMapForecast.HourlyForecast.Weather.class));
+        hourlyForecast.main = mock(OpenWeatherMapForecast.HourlyForecast.Main.class);
+        hourlyForecast.main.temp = 50;
+        //String date = (hourlyForecast.getDate().toString()).split(" ")[0];
+
+        doReturn(hourlyForecast).when(forecast).getForecastFor(anyInt());
+        doReturn(forecast.getForecastFor(anyInt()).getDate()).when(hourlyForecast).getDate();
+        Date date = new Date();
+        String[] splitDate = date.toString().split(" ");
+        doReturn(date).when(hourlyForecast).getDate();
+        doReturn("http://openweathermap.org/img/wn/").when(hourlyForecast.weather.get(0)).getIconUrl();
+        for(int ix = 0; ix < controller.dateTexts.size(); ix++)
+        {
+
+            doReturn(splitDate[0] + " " + splitDate[1] + " " + splitDate[2]).when(dateTexts.get(ix)).getText();
+            doReturn("50\u00B0").when(tempTexts.get(ix)).getText();
+            doReturn(mock(Image.class)).when(iconImages.get(ix)).getImage();
+        }
 
         //when
         controller.onOpenWeatherMapForecast(forecast);
 
         //then
-        verify(controller.currentTemp).setText("50\u00B0");
-        verify(controller.currentIcon).setImage(mockImage);
-        verify(controller.dateTexts).get(0).setText("Wed May 05");
-        verify(controller.dateTexts).get(1).setText("Thu May 06");
-        verify(controller.dateTexts).get(2).setText("Fri May 07");
-        verify(controller.tempTexts).get(0).setText("49\u00B0");
-        verify(controller.tempTexts).get(1).setText("48\u00B0");
-        verify(controller.tempTexts).get(2).setText("52\u00B0");
-        verify(controller.iconImages).get(0).setImage(mockImage);
-        verify(controller.iconImages).get(1).setImage(mockImage);
-        verify(controller.iconImages).get(2).setImage(mockImage);
-
+        for(int ix = 0; ix < controller.dateTexts.size(); ix++)
+        {
+            verify(controller.dateTexts.get(ix)).setText(splitDate[0] + " " + splitDate[1] + " " + splitDate[2]);
+            verify(controller.tempTexts.get(ix)).setText("50\u00B0");
+            verify(controller.iconImages.get(ix)).setImage(any(Image.class));
+        }
     }
 
     private void givenOpenWeatherMapController()
@@ -153,22 +201,19 @@ public class OpenWeatherMapControllerTest
         
         currentIcon = mock(ImageView.class);
         controller.currentIcon = currentIcon;
-        dateTexts = Arrays.asList(
-                mock(Text.class),
+        dateTexts = asList(
                 mock(Text.class),
                 mock(Text.class)
         );
         controller.dateTexts = dateTexts;
         
-        tempTexts = Arrays.asList(
-                mock(Text.class),
+        tempTexts = asList(
                 mock(Text.class),
                 mock(Text.class)
         );
         controller.tempTexts = tempTexts;
         
-        iconImages = Arrays.asList(
-                mock(ImageView.class),
+        iconImages = asList(
                 mock(ImageView.class),
                 mock(ImageView.class)
         );
